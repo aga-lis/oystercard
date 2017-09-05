@@ -23,17 +23,25 @@ describe Oystercard do
     end
   end
 
-    describe '#journey' do
-      it 'is initially not in a journey' do
-        expect(oystercard).not_to be_in_journey
-      end
-      it 'can touch in' do
-        oystercard.touch_in
-        expect(oystercard).to be_in_journey
-      end
-      it 'can touch out' do
-        oystercard.touch_out
-        expect(oystercard).not_to be_in_journey
-      end
+  describe '#journey' do
+    it 'is initially not in a journey' do
+      expect(oystercard).not_to be_in_journey
     end
+    it 'can touch in' do
+      oystercard.touch_in
+      expect(oystercard).to be_in_journey
+    end
+    it 'can touch out' do
+      oystercard.touch_out
+      expect(oystercard).not_to be_in_journey
+    end
+    it 'will not touch in if below minimum balance' do
+      expect{ subject.touch_in }.to raise_error "Insufficient balance to touch in"
+    end
+#    it 'raises an error if card does not have minimum balance' do
+#      card_min_balance = Oystercard::CARD_LIMIT
+#      oystercard.touch_in
+#      expect{ oystercard.touch_in}.to raise_error 'Cannot touch in: minimum balance not met'
+#    end
+  end
 end
