@@ -23,7 +23,7 @@ describe Oystercard do
     end
   end
 
-    describe '#in_journey' do
+    describe '#journey' do
       it 'is initially not in a journey' do
         expect(oystercard).not_to be_in_journey
       end
