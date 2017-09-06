@@ -16,7 +16,7 @@ describe Oystercard do
     it 'raises an error when over max amount' do
       card_limit = Oystercard::CARD_LIMIT
       oystercard.top_up(card_limit)
-       expect{ oystercard.top_up 1 }.to raise_error 'Oystercard maximum balance of £90 exceeded'
+       expect{ oystercard.top_up 1 }.to raise_error "Oystercard maximum balance of #{Oystercard::CARD_LIMIT} exceeded"
     end
     it 'deducts fare from my card' do
       expect{ oystercard.deduct 1 }.to change{ oystercard.balance }.by -1
@@ -28,6 +28,7 @@ describe Oystercard do
       expect(oystercard).not_to be_in_journey
     end
     it 'can touch in' do
+      oystercard.top_up(5)
       oystercard.touch_in
       expect(oystercard).to be_in_journey
     end
