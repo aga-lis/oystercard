@@ -8,7 +8,7 @@ describe Oystercard do
 
   describe '#top_up' do
     it{ is_expected.to respond_to(:top_up).with(1).argument }
-    it{ is_expected.to respond_to(:deduct).with(1).argument }
+    #it{ is_expected.to respond_to(:deduct).with(1).argument }
 
     it 'tops up by amount given' do
       expect{ oystercard.top_up 1 }.to change{ oystercard.balance }.by 1
@@ -19,7 +19,9 @@ describe Oystercard do
        expect{ oystercard.top_up 1 }.to raise_error "Oystercard maximum balance of #{Oystercard::CARD_LIMIT} exceeded"
     end
     it 'deducts fare from my card' do
-      expect{ oystercard.deduct 1 }.to change{ oystercard.balance }.by -1
+      oystercard.top_up(5)
+      oystercard.send(:deduct, 5)
+      expect { oystercard.touch_out }.to change{ oystercard.balance }.by -1
     end
   end
 
@@ -33,6 +35,7 @@ describe Oystercard do
       expect(oystercard).to be_in_journey
     end
     it 'can touch out' do
+      #expect { oystercard.touch_out }.to change{ oystercard.balance }.by -1
       oystercard.touch_out
       expect(oystercard).not_to be_in_journey
     end
