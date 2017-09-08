@@ -1,13 +1,13 @@
+require_relative 'journey'
 class Oystercard
-  attr_reader :balance, :journeys
-  attr_reader :entry_station
+  attr_reader :balance, :journey
   CARD_LIMIT = 90
-  #CARD_MIN_BALANCE = 1
+  CARD_MIN_BALANCE = 1
+  PENALTY_FARE = 6
 
   def initialize
     @balance = 0
-    @in_journey = false
-    @journeys = []
+    @journey = Journey.new
   end
 
   def top_up(amount)
@@ -15,22 +15,23 @@ class Oystercard
     @balance += amount
   end
 
-  def in_journey?
-    !!entry_station
-  end
-
   def touch_out(exit_station)
-    @in_journey = false
-    @balance -= 1
-    @exit_station = {:exit_station => exit_station}
-    @journeys << @entry_station.merge(@exit_station)
-    @entry_station = nil
-
+    if @journey.in_journey?
+      deduct(CARD_MIN_BALANCE)
+    else
+      deduct(PENALTY_FARE)
+      @journey.journey_touch_in("No entry station logged")
+    end
+    @journey.journey_touch_out(exit_station)
   end
 
   def touch_in(station)
     fail "Insufficient balance to touch in" if balance < 1
-    @entry_station = {:entry_station => station}
+    if @journey.in_journey?
+      deduct(PENALTY_FARE)
+    @journey.journey_touch_out("No exit station logged")
+  end
+    @journey.journey_touch_in(station)
   end
 
 private
@@ -38,5 +39,4 @@ private
 def deduct(value)
   @balance -= value
 end
-
 end
