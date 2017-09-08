@@ -6,6 +6,9 @@ describe Oystercard do
   it 'has a balance of zero' do
     expect(oystercard.balance).to eq(0)
   end
+  it 'has no journey history' do
+    expect(oystercard.journeys).to eq []
+  end
 
   describe '#top_up' do
     it{ is_expected.to respond_to(:top_up).with(1).argument }
@@ -21,8 +24,9 @@ describe Oystercard do
     end
     it 'deducts fare from my card' do
       oystercard.top_up(5)
+      oystercard.touch_in(:station)
       oystercard.send(:deduct, 5)
-      expect { oystercard.touch_out }.to change{ oystercard.balance }.by -1
+      expect { oystercard.touch_out(:station) }.to change{ oystercard.balance }.by -1
     end
   end
 
@@ -37,12 +41,14 @@ describe Oystercard do
     end
     it 'should remember where I started my journey' do
       oystercard.top_up(5)
-      oystercard.touch_in(station)
-      expect(oystercard.entry_station).to eq station
+      oystercard.touch_in(:station)
+      expect(oystercard.entry_station[:entry_station]).to eq :station
     end
     it 'can touch out' do
       #expect { oystercard.touch_out }.to change{ oystercard.balance }.by -1
-      oystercard.touch_out
+      oystercard.top_up(10)
+      oystercard.touch_in(:station)
+      oystercard.touch_out(:station)
       expect(oystercard).not_to be_in_journey
     end
     it 'will not touch in if below minimum balance' do
@@ -52,7 +58,7 @@ describe Oystercard do
     it 'will make the value of entry_station nil when touched out' do
       oystercard.top_up(5)
       oystercard.touch_in(:station)
-      oystercard.touch_out
+      oystercard.touch_out(:station)
       expect(oystercard.entry_station).to eq nil
     end
 #    it 'raises an error if card does not have minimum balance' do
